@@ -1,0 +1,122 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { loadImages } from "../lib/loading";
+import jTimeline from "../lib/jTimelineCss";
+import { loadFlashImages, Flash } from "../lib/flash";
+import { Panel, PanelContext } from "../lib/panel";
+import { PanelAnimation } from "../lib/panelAnimation";
+
+
+/**
+ * 主页配置
+ */
+class IndexPage extends React.Component {
+    componentDidMount() {
+        window.go = (url, trans) => {
+            this.refs.root.panel.go(url, trans);
+        };
+        window.goPop = (url, trans) => {
+            this.refs.popPanel.panel.go(url, trans);
+        };
+    }
+    render() {
+        return <div className="full">
+            <PanelContext ref="root" url="/loading" animation={PanelAnimation.bottom}>
+                <div className="full">
+                    <h1 style={{ textAlign: "center" }}>Test Page</h1>
+                    <Panel url="loading" component={LoadingPage} />
+                    <Panel url="s" root={() => this.refs.s}>
+                        <div className="full" ref="s">
+                            <Panel url="index" root={() => this.refs.index}>
+                                <div className="full" ref="index">
+                                    <h2 className="center" onClick={() => go("/s/item")}>Index Page</h2>
+                                </div>
+                            </Panel>
+                            <Panel url="item" root={() => this.refs.item}>
+                                <div className="full" ref="item">
+                                    <h2 className="center" onClick={() => go("/s/index", PanelAnimation.top)}>Item Page</h2>
+                                </div>
+                            </Panel>
+                        </div>
+                    </Panel>
+                </div>
+            </PanelContext>
+            <PanelContext ref="popPanel" url="/loading" animation={PanelAnimation.fade}>
+                <Panel url="s">
+                    <div className="full" style={{ zIndex: 100, background: "rgba(0,0,0,0.6)" }}>
+                        <h2 className="center">Popup Page</h2>
+                    </div>
+                </Panel>
+            </PanelContext>
+        </div>
+    }
+}
+
+/**
+ * 加载中…
+ */
+class LoadingPage extends React.Component {
+    updateProgress = p => {
+        //更新进度
+        this.refs.percent.innerHTML = Math.round(p);
+    };
+
+    async loadAssets() {
+        //加载素材
+        await $.getScript(getVersionUrl("assets/images.js"));
+        await loadImages(imagesJson);
+    }
+
+    async componentDidMount() {
+        //淡入
+        jTimeline.fromTo(this.refs.root, 0.4, { opacity: 0 }, { opacity: 1 });
+        try {
+            await this.loading(10, 2);
+        }
+        catch (e) {
+            return alert(e.message);
+        }
+        //跳转到主页
+        go("/s/index");
+    }
+
+    render() {
+        return <div className="full" ref="root">
+            <div className="page">
+                <Flash className="abs" flash="loading" />
+                <div className="center" style={{ top: "8.19rem", color: "#fff", fontSize: "0.27rem" }}><span ref="percent">0</span>%</div>
+            </div>
+        </div>
+    }
+
+    async loading(loadingTime, limitTime) {
+        //跑模拟进度
+        var line = jTimeline.to(jTimeline.temp(this.updateProgress)
+            , loadingTime //模拟进度跑loadingTime秒
+            , { val: 90 + Math.random() * 9 }); //模拟进度跑到90+卡住
+
+        //防止加载过快看不到效果
+        var limitWait = new Promise(ps => setTimeout(ps, limitTime * 1000));
+
+        await this.loadAssets();
+
+        //等待最小时间
+        await limitWait;
+        //干掉模拟进度
+        line.kill();
+        this.updateProgress(100);
+    }
+}
+
+
+//启动
+(async function () {
+    //加载"loading page"所需要的图片
+    await $.getScript(getVersionUrl("assets/loadImages.js"));
+    await loadImages(loadImagesJson);
+
+    //加载flash
+    await $.getScript(getVersionUrl("assets/flash.js"));
+    loadFlashImages();
+    ReactDOM.render(<IndexPage />, document.getElementById("client_area"));
+})();

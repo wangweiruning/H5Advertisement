@@ -1,0 +1,15 @@
+{
+  "name": "testclient",
+  "version": "1.0.0",
+  "description": "testclient",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./index.js"
+  },
+  "author": "Jat",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.4",
+    "ws": "^5.2.2"
+  }
+}

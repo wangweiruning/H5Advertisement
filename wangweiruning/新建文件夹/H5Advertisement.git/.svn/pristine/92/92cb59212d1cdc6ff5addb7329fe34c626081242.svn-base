@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html style="touch-action: none;">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <title>Template</title>
+    <script>
+        var wVersion = 0;
+        var wBaseUrl = "";
+        //rem适配
+        var psdWidth = 750;
+        window.onresize = function() {
+            var w = window.innerWidth || document.documentElement.clientWidth || document.body.offsetWidth;
+            var fontSize = w * 100 / psdWidth;
+            document.documentElement.style.fontSize = fontSize + 'px';
+        };
+        window.onresize();
+        //document.write
+        function getVersionUrl(url) {
+            return wBaseUrl + url + "?v=" + wVersion;
+        }
+
+        var writes = [];
+        function appendScript() {
+            for (var i = 0; i < arguments.length; ++i) {
+                writes.push('<scr'+'ipt type="text/javascript" src="' + getVersionUrl(arguments[i]) + '"></scr'+'ipt>');
+            }
+        }
+        
+        function getQueryString(name) {
+            var reg = new RegExp('(^\\?|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = location.search.match(reg);
+            if (r != null) return unescape(r[2]);
+        }
+    </script>
+    <style type="text/css">
+        html { background: #0F0103; color: #fff; }
+        body { font-size: 0.24rem; }
+        .abs { position: absolute; }
+        .center, .page, .centerb { position: absolute; left: 50%; top: 50%; -webkit-transform: translate(-50%,-50%); transform: translate(-50%,-50%) }
+        .centerb { top: auto; bottom: 50%; }
+        .full, .fill { position: absolute; width: 100%; height: 100%;left:0;top:0; }
+        .full { overflow: hidden; width: 7.5rem; max-height: 14.48rem; min-height: 9.75rem; }
+        .page { width: 7.5rem; height: 14.48rem; }
+        .pp { position: absolute; left: 0; top: 50%; -webkit-transform: translate(0, -7.24rem); transform: tratranslate(0, -7.24rem);  }
+        .pp1 { position: absolute; left: 0; top: 60%; -webkit-transform: translate(0, -8.69rem); transform: tratranslate(0, -8.69rem);  }
+        .pp2 { position: absolute; left: 0; top: 70%; -webkit-transform: translate(0, -10.14rem); transform: tratranslate(0, -10.14rem);  }
+        .pp3 { position: absolute; left: 0; top: 80%; -webkit-transform: translate(0, -11.584rem); transform: tratranslate(0, -11.584rem);  }
+        .pp4 { position: absolute; left: 0; top: 90%; -webkit-transform: translate(0, -13.032rem); transform: tratranslate(0, -13.032rem);  }
+        .pp5 { position: absolute; left: 0; top: 100%; -webkit-transform: translate(0, -14.48rem); transform: tratranslate(0, -14.48rem);  }
+    </style>
+</head>
+<body>
+    <div id="client_area"></div>
+    <script>
+        appendScript("js/polyfill.min.js", "js/jquery-3.3.1.min.js", "js/createjs-2015.11.26.min.js", "bundle.js");
+    </script>
+    <script>
+        document.write(writes.join(''));
+        document.body.addEventListener('touchmove' , function(e){
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
